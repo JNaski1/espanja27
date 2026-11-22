@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Espanja 2027 – Projektisuunnitelma</title>
+<script>
+if (sessionStorage.getItem("espanja_logged_in") !== "true") {
+    window.location.replace("login.html");
+}
+</script>
+
+<style>
+:root {
+    --bg: #f4f5f7;
+    --card: #ffffff;
+    --text: #20252d;
+    --muted: #737b87;
+    --border: #e5e7eb;
+    --accent: #2563eb;
+    --green: #16a34a;
+    --red: #dc2626;
+    --orange: #d97706;
+}
+
+* { box-sizing: border-box; }
+
+body {
+    margin: 0;
+    padding: 40px 20px;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
+                 sans-serif;
+}
+
+.container {
+    max-width: 900px;
+    margin: auto;
+}
+
+header {
+    margin-bottom: 30px;
+}
+
+.eyebrow {
+    color: var(--accent);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+}
+
+h1 {
+    font-size: 32px;
+    margin: 8px 0;
+}
+
+.subtitle {
+    color: var(--muted);
+    font-size: 15px;
+}
+
+.summary {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
+.stat {
+    background: var(--card);
+    padding: 20px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+}
+
+.stat strong {
+    display: block;
+    font-size: 26px;
+    margin-bottom: 4px;
+}
+
+.stat span {
+    color: var(--muted);
+    font-size: 12px;
+}
+
+.progress-card {
+    background: var(--card);
+    padding: 22px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    margin-bottom: 30px;
+}
+
+.progress-heading {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.progress-track {
+    height: 9px;
+    background: #e5e7eb;
+    border-radius: 20px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    width: 0%;
+    background: var(--green);
+    transition: width .3s;
+}
+
+.phase {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    margin-bottom: 18px;
+    overflow: hidden;
+}
+
+.phase-header {
+    padding: 17px 22px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.phase-header h2 {
+    font-size: 17px;
+    margin: 0;
+}
+
+.phase-date {
+    font-size: 12px;
+    color: var(--muted);
+    white-space: nowrap;
+}
+
+.task-list {
+    padding: 5px 22px;
+}
+
+.task {
+    display: flex;
+    align-items: flex-start;
+    gap: 13px;
+    padding: 15px 0;
+    border-bottom: 1px solid #f0f1f3;
+}
+
+.task:last-child {
+    border-bottom: none;
+}
+
+.task input {
+    width: 18px;
+    height: 18px;
+    margin-top: 2px;
+    accent-color: var(--green);
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.task-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.task-title {
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.task-description {
+    color: var(--muted);
+    font-size: 12px;
+    margin-top: 5px;
+    line-height: 1.5;
+}
+
+.task.completed .task-title {
+    text-decoration: line-through;
+    color: #9ca3af;
+}
+
+.tag {
+    font-size: 10px;
+    font-weight: 700;
+    padding: 5px 8px;
+    border-radius: 5px;
+    white-space: nowrap;
+    align-self: center;
+}
+
+.critical {
+    color: var(--red);
+    background: #fee2e2;
+}
+
+.warning {
+    color: var(--orange);
+    background: #fef3c7;
+}
+
+.normal {
+    color: #2563eb;
+    background: #dbeafe;
+}
+
+.success {
+    color: var(--green);
+    background: #dcfce7;
+}
+
+.deadlines {
+    margin-top: 30px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 22px;
+}
+
+.deadlines h2 {
+    font-size: 17px;
+    margin: 0 0 18px;
+}
+
+.deadline {
+    display: grid;
+    grid-template-columns: 115px 1fr;
+    gap: 15px;
+    padding: 12px 0;
+    border-bottom: 1px solid #f0f1f3;
+    font-size: 13px;
+}
+
+.deadline:last-child { border-bottom: none; }
+
+.deadline-date {
+    font-weight: 700;
+}
+
+.actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 20px;
+}
+
+button {
+    border: 1px solid var(--border);
+    background: white;
+    padding: 10px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+button:hover {
+    background: #f3f4f6;
+}
+
+footer {
+    text-align: center;
+    color: var(--muted);
+    font-size: 11px;
+    margin-top: 30px;
+}
+
+@media (max-width: 600px) {
+    body { padding: 22px 12px; }
+    h1 { font-size: 25px; }
+    .summary { gap: 8px; }
+    .stat { padding: 13px; }
+    .stat strong { font-size: 21px; }
+    .stat span { font-size: 10px; }
+    .phase-header { padding: 15px; }
+    .task-list { padding: 5px 15px; }
+    .tag { font-size: 9px; }
+    .deadline { grid-template-columns: 90px 1fr; }
+}
+</style>
+</head>
+
+<body>
+<div class="container">
+
+<header>
+    <div class="eyebrow">Projektisuunnitelma · 2027</div>
+    <h1>Espanjan-asuminen</h1>
+    <div class="subtitle">1.3.–31.5.2027 · Alicante, Espanja</div>
+</header>
+
+<section class="summary">
+    <div class="stat">
+        <strong id="total">10</strong>
+        <span>Tehtävää yhteensä</span>
+    </div>
+    <div class="stat">
+        <strong id="completed">0</strong>
+        <span>Valmiina</span>
+    </div>
+    <div class="stat">
+        <strong id="remaining">10</strong>
+        <span>Tekemättä</span>
+    </div>
+</section>
+
+<section class="progress-card">
+    <div class="progress-heading">
+        <span>Projektin eteneminen</span>
+        <span id="percentage">0 %</span>
+    </div>
+    <div class="progress-track">
+        <div class="progress-fill" id="progress"></div>
+    </div>
+</section>
+
+<!-- MARRASKUU -->
+
+<section class="phase">
+    <div class="phase-header">
+        <h2>01 · Marraskuu 2026</h2>
+        <span class="phase-date">30.11.2026</span>
+    </div>
+    <div class="task-list">
+
+        <div class="task">
+            <input type="checkbox" data-id="valtteri">
+            <div class="task-content">
+                <div class="task-title">Valtterin irtisanominen tai vaihtoehtoinen diili</div>
+                <div class="task-description">Irtisanomisesta on ilmoitettava viimeistään 30.11.2026. Irtisanomisaika 1 kuukausi.</div>
+            </div>
+            <span class="tag critical">KRIITTINEN</span>
+        </div>
+
+    </div>
+</section>
+
+<!-- JOULUKUU -->
+
+<section class="phase">
+    <div class="phase-header">
+        <h2>02 · Joulukuu 2026</h2>
+        <span class="phase-date">31.12.2026</span>
+    </div>
+    <div class="task-list">
+
+        <div class="task">
+            <input type="checkbox" data-id="etatyolupa">
+            <div class="task-content">
+                <div class="task-title">Cecilian etätyöluvan varmistaminen</div>
+                <div class="task-description">Haetaan ja varmistetaan työnantajan hyväksyntä Espanjassa työskentelylle.</div>
+            </div>
+            <span class="tag critical">KORKEA</span>
+        </div>
+
+        <div class="task">
+            <input type="checkbox" data-id="asunto">
+            <div class="task-content">
+                <div class="task-title">Espanjan asunnon vahvistaminen</div>
+                <div class="task-description">Asunto ja vuokrasopimus vahvistettava. Asunnon oltava käytettävissä 1.3.2027 alkaen.</div>
+            </div>
+            <span class="tag critical">KORKEA</span>
+        </div>
+
+        <div class="task">
+            <input type="checkbox" data-id="lennot">
+            <div class="task-content">
+                <div class="task-title">Lentojen ostaminen Alicanteen</div>
+                <div class="task-description">Lennot maaliskuun 2027 alkuun.</div>
+            </div>
+            <span class="tag normal">VARAUS</span>
+        </div>
+
+    </div>
+</section>
+
+<!-- TAMMIKUU -->
+
+<section class="phase">
+    <div class="phase-header">
+        <h2>03 · Tammikuu 2027</h2>
+        <span class="phase-date">31.1.2027</span>
+    </div>
+    <div class="task-list">
+
+        <div class="task">
+            <input type="checkbox" data-id="nyyrikki">
+            <div class="task-content">
+                <div class="task-title">Nyyrikin irtisanominen</div>
+                <div class="task-description">Irtisanominen tehtävä aivan viimeistään 31.1.2027.</div>
+            </div>
+            <span class="tag critical">VIIMEINEN MÄÄRÄAIKA</span>
+        </div>
+
+        <div class="task">
+            <input type="checkbox" data-id="varasto">
+            <div class="task-content">
+                <div class="task-title">Varastointisopimus – Varastoi.se</div>
+                <div class="task-description">Sopimus valmistellaan etukäteen. Voimaantulo 1.2.2027. Toistaiseksi voimassa oleva sopimus.</div>
+            </div>
+            <span class="tag warning">SOPIMUS</span>
+        </div>
+
+    </div>
+</section>
+
+<!-- HELMIKUU -->
+
+<section class="phase">
+    <div class="phase-header">
+        <h2>04 · Helmikuu 2027</h2>
+        <span class="phase-date">1.–28.2.2027</span>
+    </div>
+    <div class="task-list">
+
+        <div class="task">
+            <input type="checkbox" data-id="tavarat">
+            <div class="task-content">
+                <div class="task-title">Tavaroiden siirtäminen varastoon</div>
+                <div class="task-description">Varastointi käynnistyy 1.2.2027. Tavaroita siirretään vaiheittain helmikuun aikana. Kaikki valmiina 28.2. mennessä.</div>
+            </div>
+            <span class="tag critical">28.2. VALMIS</span>
+        </div>
+
+        <div class="task">
+            <input type="checkbox" data-id="aseet">
+            <div class="task-content">
+                <div class="task-title">Aseiden vienti Mikolle</div>
+                <div class="task-description">Sovitaan aseiden luovutuksesta, lainauksesta ja säilytyksestä.</div>
+            </div>
+            <span class="tag warning">JÄRJESTELY</span>
+        </div>
+
+        <div class="task">
+            <input type="checkbox" data-id="poliisi">
+            <div class="task-content">
+                <div class="task-title">Aseiden lainausilmoitus poliisille</div>
+                <div class="task-description">Selvitetään ilmoitusmenettely ja hoidetaan tarvittavat ilmoitukset ennen lainauksen alkamista.</div>
+            </div>
+            <span class="tag warning">ILMOITUS</span>
+        </div>
+
+    </div>
+</section>
+
+<!-- MAALISKUU–TOUKOKUU -->
+
+<section class="phase">
+    <div class="phase-header">
+        <h2>05 · Maaliskuu–toukokuu 2027</h2>
+        <span class="phase-date">1.3.–31.5.2027</span>
+    </div>
+    <div class="task-list">
+
+        <div class="task">
+            <input type="checkbox" data-id="lahto">
+            <div class="task-content">
+                <div class="task-title">Lähtö Alicanteen</div>
+                <div class="task-description">Espanjan-jakso alkaa 1.3.2027. Asunto, etätyö ja Suomen järjestelyt kunnossa.</div>
+            </div>
+            <span class="tag success">TAVOITE</span>
+        </div>
+
+        <div class="task">
+            <input type="checkbox" data-id="paluu">
+            <div class="task-content">
+                <div class="task-title">Paluu Suomeen</div>
+                <div class="task-description">Espanjan-jakso päättyy toukokuun lopussa 2027.</div>
+            </div>
+            <span class="tag success">31.5.2027</span>
+        </div>
+
+    </div>
+</section>
+
+<!-- MÄÄRÄAJAT -->
+
+<section class="deadlines">
+    <h2>Kriittiset määräpäivät</h2>
+
+    <div class="deadline">
+        <span class="deadline-date">30.11.2026</span>
+        <span>Valtterin irtisanomisesta ilmoitettu</span>
+    </div>
+    <div class="deadline">
+        <span class="deadline-date">31.12.2026</span>
+        <span>Asunto ja etätyölupa varmistettu</span>
+    </div>
+    <div class="deadline">
+        <span class="deadline-date">31.1.2027</span>
+        <span>Nyyrikin irtisanominen tehty</span>
+    </div>
+    <div class="deadline">
+        <span class="deadline-date">1.2.2027</span>
+        <span>Varastointisopimus alkaa</span>
+    </div>
+    <div class="deadline">
+        <span class="deadline-date">28.2.2027</span>
+        <span>Varastointi ja muut järjestelyt valmiina</span>
+    </div>
+    <div class="deadline">
+        <span class="deadline-date">1.3.2027</span>
+        <span>Lähtö Espanjaan</span>
+    </div>
+    <div class="deadline">
+        <span class="deadline-date">31.5.2027</span>
+        <span>Espanjan-jakso päättyy</span>
+    </div>
+
+</section>
+
+<div class="actions">
+    <button onclick="resetTasks()">Nollaa kaikki valinnat</button>
+</div>
+
+<footer>
+    ESPANJA 2027 · PROJEKTIN SEURANTA
+    <br><br>
+    Tehtävien tilanne tallentuu automaattisesti selaimeen.
+</footer>
+
+</div>
+
+<script>
+const checkboxes = document.querySelectorAll(
+    '.task input[type="checkbox"]'
+);
+
+function updateProgress() {
+    const total = checkboxes.length;
+    const completed = [...checkboxes].filter(
+        checkbox => checkbox.checked
+    ).length;
+
+    const percentage = Math.round(
+        (completed / total) * 100
+    );
+
+    document.getElementById('total').textContent = total;
+    document.getElementById('completed').textContent = completed;
+    document.getElementById('remaining').textContent =
+        total - completed;
+
+    document.getElementById('percentage').textContent =
+        percentage + ' %';
+
+    document.getElementById('progress').style.width =
+        percentage + '%';
+
+    checkboxes.forEach(checkbox => {
+        checkbox.closest('.task').classList.toggle(
+            'completed',
+            checkbox.checked
+        );
+    });
+}
+
+checkboxes.forEach(checkbox => {
+    const id = checkbox.dataset.id;
+
+    checkbox.checked =
+        localStorage.getItem('espanja_' + id) === 'true';
+
+    checkbox.addEventListener('change', () => {
+        localStorage.setItem(
+            'espanja_' + id,
+            checkbox.checked
+        );
+
+        updateProgress();
+    });
+});
+
+function resetTasks() {
+    if (!confirm('Haluatko varmasti nollata kaikki tehtävävalinnat?')) {
+        return;
+    }
+
+    checkboxes.forEach(checkbox => {
+        checkbox.checked = false;
+        localStorage.removeItem(
+            'espanja_' + checkbox.dataset.id
+        );
+    });
+
+    updateProgress();
+}
+
+updateProgress();
+</script>
+
+</body>
+</html>
